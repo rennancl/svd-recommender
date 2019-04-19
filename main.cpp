@@ -5,7 +5,7 @@
 #include <tuple>
 
 using namespace std;
-
+#define KDIMENTIONS 30
 // string -> tuple<int, int, int>
 
 pair<int,int> max_user_item(vector<tuple<int, int, int, int>> vetor){
@@ -29,19 +29,20 @@ pair<int,int> max_user_item(vector<tuple<int, int, int, int>> vetor){
     max_values.second = max_item;
     return max_values;
 }
-    
-int** create_matrix(vector<tuple<int, int, int, int>> input_vector  vector<int>(make_tuple(0,0,0,0)), pair<int,int> dimentions, bool fill = false){
-
+int** create_matrix(pair<int,int> dimentions){
     int** matrix = new int*[dimentions.first + 1];
     for (int i = 0; i < dimentions.first + 1; i++)
     {
         matrix[i] = new int[dimentions.second + 1];
     }
-    
-    if(fill){
-        for(unsigned i = 0; i < input_vector.size(); i++){
-            matrix[get<0>(input_vector[i])][get<1>(input_vector[i])] = get<2>(input_vector[i]);
-        }
+    return matrix;
+}
+
+int** fill_matrix(vector<tuple<int, int, int, int>> input_vector, pair<int,int> dimentions){
+
+    int** matrix = create_matrix(dimentions);
+    for(unsigned i = 0; i < input_vector.size(); i++){
+        matrix[get<0>(input_vector[i])][get<1>(input_vector[i])] = get<2>(input_vector[i]);
     }
     return matrix;
 }
@@ -110,8 +111,8 @@ pair<int**, int**> stochastic_gradient_descent(int **matrix,pair<int,int> diment
     q_dimentions.first = k;
     q_dimentions.second = dimentions.second;
 
-    int **p_matrix  = create_matrix(matrix, p_dimentions);
-    int **q_matrix  = create_matrix(matrix, q_dimentions);
+    int **p_matrix  = create_matrix(p_dimentions);
+    int **q_matrix  = create_matrix(q_dimentions);
     
     bool converged = false;
     while(1){    
@@ -133,16 +134,31 @@ int main(int argc, char *argv[])
     vector<tuple<int, int, int, int>> targets= process_inputs(targets_filename);
 
     pair<int,int> dimentions = max_user_item(ratings);
-    int** matrix = create_matrix(ratings, dimentions, true);
+    int** matrix = fill_matrix(ratings, dimentions);
 
     int** p_matrix;
     int** q_matrix;
     pair<int**, int**> pqmatrix;
 
-    pqmatrix = stochastic_gradient_descent(matrix,dimentions, 30);
+    pqmatrix = stochastic_gradient_descent(matrix,dimentions,KDIMENTIONS);
     p_matrix = pqmatrix.first;
     q_matrix = pqmatrix.second;
     
+    // iterate throug p matriz to check if it was created
+    for(int i =0; i < dimentions.first; i++){
+        for(int j = 0; j < KDIMENTIONS; j++)
+        {
+            int a = p_matrix[i][j];
+        }
+    }
+
+    // iterate throug q matriz to check if it was created
+    for(int i =0; i < KDIMENTIONS; i++){
+        for(int j = 0; j < dimentions.second; j++)
+        {
+            int a = q_matrix[i][j];
+        }
+    }
     create_predictions_file(1);
     return 0;
 }
