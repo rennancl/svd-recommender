@@ -6,9 +6,72 @@
 
 using namespace std;
 #define KDIMENTIONS 30
-// string -> tuple<int, int, int>
+#define LEARNING_RATE 0.1 
 
-pair<int,int> max_user_item(vector<tuple<int, int, int, int>> vetor){
+class Matrix{
+    public:
+        int x_dimention;
+        int y_dimention;
+        pair<int, int> dimentions;
+        int** matrix;
+
+    Matrix(pair<int, int> dimentions){
+        this->dimentions = dimentions;
+        this->x_dimention = dimentions.first;
+        this->y_dimention = dimentions.second;
+    }
+
+    void create_matrix(){
+        this->matrix = new int*[x_dimention + 1];
+        for (int i = 0; i < x_dimention + 1; i++)
+        {
+            this->matrix[i] = new int[y_dimention + 1];
+        }
+    }
+
+    void fill_matrix(vector<tuple<int, int, int, int>> input_vector){
+        for(unsigned i = 0; i < input_vector.size(); i++){
+            this->matrix[get<0>(input_vector[i])][get<1>(input_vector[i])] = get<2>(input_vector[i]);
+        }
+    }
+};
+
+class Model{
+    public:
+        pair<int, int> p_dimentions;
+        pair<int, int> q_dimentions;
+        float learning_rate;
+        Matrix* p_matrix;
+        Matrix* q_matrix;
+    
+    Model(pair<int, int> dimentions, int knumber, int learning_rate){
+        this->learning_rate = learning_rate;
+        this->p_dimentions.first = dimentions.first;
+        this->p_dimentions.second = knumber;
+        this->q_dimentions.first = knumber;
+        this->q_dimentions.second = dimentions.second;
+        p_matrix = new Matrix(p_dimentions);
+        q_matrix = new Matrix(q_dimentions);
+    }
+
+    void create_pq_matrix(){
+        this->q_matrix->create_matrix();
+        this->p_matrix->create_matrix();
+    }
+
+    Matrix getq_matrix(){
+        return *q_matrix;
+    }
+    void stochastic_gradient_descent(){
+        bool converged = false;
+        while(1){    
+            converged = true;
+            if(converged) break;
+        }
+    }
+};
+
+pair<int,int> get_matrix_dimentions(vector<tuple<int, int, int, int>> vetor){
     pair<int,int> max_values;
     int max_user = 0;
     int max_item = 0;
@@ -29,23 +92,7 @@ pair<int,int> max_user_item(vector<tuple<int, int, int, int>> vetor){
     max_values.second = max_item;
     return max_values;
 }
-int** create_matrix(pair<int,int> dimentions){
-    int** matrix = new int*[dimentions.first + 1];
-    for (int i = 0; i < dimentions.first + 1; i++)
-    {
-        matrix[i] = new int[dimentions.second + 1];
-    }
-    return matrix;
-}
 
-int** fill_matrix(vector<tuple<int, int, int, int>> input_vector, pair<int,int> dimentions){
-
-    int** matrix = create_matrix(dimentions);
-    for(unsigned i = 0; i < input_vector.size(); i++){
-        matrix[get<0>(input_vector[i])][get<1>(input_vector[i])] = get<2>(input_vector[i]);
-    }
-    return matrix;
-}
 vector<tuple<int, int, int, int>> process_inputs(string filename){
     ifstream file;
     file.open(filename);
@@ -94,71 +141,27 @@ vector<tuple<int, int, int, int>> process_inputs(string filename){
     return inputs;
 }
 
-void create_predictions_file(int predictions){
-    cout << predictions << endl;
-    return;
-}
-
-pair<int**, int**> stochastic_gradient_descent(int **matrix,pair<int,int> dimentions, int k){
-    pair<int**, int**> matrixes;
-    
-    pair<int, int> p_dimentions;
-    pair<int, int> q_dimentions;
-
-    p_dimentions.first = dimentions.first;
-    p_dimentions.second = k;
-
-    q_dimentions.first = k;
-    q_dimentions.second = dimentions.second;
-
-    int **p_matrix  = create_matrix(p_dimentions);
-    int **q_matrix  = create_matrix(q_dimentions);
-    
-    bool converged = false;
-    while(1){    
-        converged = true;
-        if(converged) break;
-    }
-
-    matrixes.first = p_matrix;
-    matrixes.second = q_matrix;
-    return matrixes;
-}
-
 int main(int argc, char *argv[])
 { 
     string ratings_filename = argv[1];
     string targets_filename = argv[2];
 
-    vector<tuple<int, int, int, int>> ratings= process_inputs(ratings_filename);
-    vector<tuple<int, int, int, int>> targets= process_inputs(targets_filename);
+    vector<tuple<int, int, int, int>> ratings = process_inputs(ratings_filename);
+    vector<tuple<int, int, int, int>> targets = process_inputs(targets_filename);
 
-    pair<int,int> dimentions = max_user_item(ratings);
-    int** matrix = fill_matrix(ratings, dimentions);
+    Matrix matrix(get_matrix_dimentions(ratings));
+    matrix.create_matrix();
+    matrix.fill_matrix(ratings);
 
-    int** p_matrix;
-    int** q_matrix;
-    pair<int**, int**> pqmatrix;
-
-    pqmatrix = stochastic_gradient_descent(matrix,dimentions,KDIMENTIONS);
-    p_matrix = pqmatrix.first;
-    q_matrix = pqmatrix.second;
-    
-    // iterate throug p matriz to check if it was created
-    for(int i =0; i < dimentions.first; i++){
-        for(int j = 0; j < KDIMENTIONS; j++)
-        {
-            int a = p_matrix[i][j];
-        }
-    }
+    Model model(matrix.dimentions, KDIMENTIONS, LEARNING_RATE);
+    model.create_pq_matrix();
 
     // iterate throug q matriz to check if it was created
     for(int i =0; i < KDIMENTIONS; i++){
-        for(int j = 0; j < dimentions.second; j++)
+        for(int j = 0; j < matrix.dimentions.second; j++)
         {
-            int a = q_matrix[i][j];
+            int a = model.getq_matrix().matrix[i][j];
         }
     }
-    create_predictions_file(1);
     return 0;
 }
