@@ -1,10 +1,12 @@
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <string>
 #include <vector>
 #include <tuple>
 #define MODEL_DIMENTIONS 30
-#define LEARNING_RATE 0.1
+#define LEARNING_RATE 0.8
+#define MIN_ERROR 0.00001
 
 using namespace std;
 
@@ -22,10 +24,22 @@ class Matrix{
     }
 
     void create_matrix(){
-        this->matrix = new int*[x_dimention + 1];
-        for (int i = 0; i < x_dimention + 1; i++)
+    this->matrix = new int*[x_dimention + 1];
+    for (int i = 0; i < x_dimention + 1; i++)
         {
             this->matrix[i] = new int[y_dimention + 1];
+        }
+    }
+
+    void fill_ones(){
+        cout << x_dimention << "-" << y_dimention << endl;
+        for(int i = 0; i < x_dimention; i++)
+        {
+            for(int j = 0; j < y_dimention; j++)
+            {
+                matrix[i][j] = 1;
+            }
+            
         }
     }
 
@@ -45,7 +59,7 @@ class Model{
         Matrix* p_matrix;
         Matrix* q_matrix;
     
-    Model(pair<int, int> dimentions, int model_dimentions, int learning_rate){
+    Model(pair<int, int> dimentions, int model_dimentions, float learning_rate){
         this->model_dimentions = model_dimentions;
         this->learning_rate = learning_rate;
         this->p_dimentions.first = dimentions.first;
@@ -61,6 +75,12 @@ class Model{
         this->p_matrix->create_matrix();
     }
 
+    void fill_pq_matrix(){
+        this->q_matrix->fill_ones();
+        this->p_matrix->fill_ones();
+    }
+
+
     Matrix getq_matrix(){
         return *q_matrix;
     }
@@ -68,11 +88,26 @@ class Model{
     Matrix getp_matrix(){
         return *p_matrix;
     }
-    
-    void stochastic_gradient_descent(){
+
+    void stochastic_gradient_descent(Matrix main_matrix){
+        int** matrix = main_matrix.matrix;
         bool converged = false;
-        while(1){    
+        float error = 1.0;
+        while(1){
+            error = error * this->learning_rate;
+
+            for(int i = 0; i < main_matrix.x_dimention; i++)
+            {
+                for(int j = 0; j < main_matrix.y_dimention; j++)
+                {
+                    
+                }
+            }
+            
             converged = true;
+            if(error < MIN_ERROR){
+                converged = true;
+            }   
             if(converged) break;
         }
     }
@@ -87,6 +122,7 @@ int max_in_vector(vector<array<int, 4>> vetor,unsigned const int index){
     }
     return max_value;
 }
+
 pair<int,int> get_matrix_dimentions(vector<array<int, 4>> vetor){
     pair<int,int> max_values;
     max_values.first = max_in_vector(vetor, 0);
@@ -156,6 +192,8 @@ int main(int argc, char *argv[])
 
     Model model(matrix.dimentions, MODEL_DIMENTIONS, LEARNING_RATE);
     model.create_pq_matrix();
+    model.fill_pq_matrix();
+    model.stochastic_gradient_descent(matrix);
 
     return 0;
 }
