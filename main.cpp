@@ -5,7 +5,7 @@
 #include <vector>
 #include <tuple>
 #define MODEL_DIMENTIONS 30
-#define LEARNING_RATE 0.8
+#define LEARNING_RATE .9
 #define MIN_ERROR 0.00001
 
 using namespace std;
@@ -91,26 +91,43 @@ class Model{
     Matrix getp_matrix(){
         return *p_matrix;
     }
+    float get_prediction(){
+        return 0;
+    }
+
+    int get_value_product(int user, int item){
+        int value = 0;
+        for(int j = 0; j < this->model_dimentions; j++){
+            value += p_matrix->matrix[user][j] * q_matrix->matrix[j][item];
+        }
+        return value;
+    }
+
+    void update_matrix(int user, int item, int error){
+        for(int j = 0; j < this->model_dimentions; j++){
+            p_matrix->matrix[user][j] = q_matrix->matrix[j][item] * 2 * learning_rate * error ;
+            q_matrix->matrix[j][item] = p_matrix->matrix[user][j] * 2 * learning_rate * error;
+        }
+    }
 
     void stochastic_gradient_descent(){
         int user;
         int item;
         int rate;
         bool converged = false;
-        float error = 1.0;
+        int error;
 
         while(1){
-            error = error * this->learning_rate;
-
             for(unsigned i = 0; i < this->train.size(); i++){
                 user = this->train[i][0];
-                item = this->train[i][0];
-                rate = this->train[i][0];
+                item = this->train[i][1];
+                rate = this->train[i][2];
+                error = rate - get_value_product(user,item);
+                update_matrix(user, item, error);
             }
-            converged = true;
-            if(error < MIN_ERROR){
+            if(error < 5){
                 converged = true;
-            }   
+            }
             if(converged) break;
         }
     }
