@@ -3,10 +3,10 @@
 #include <string>
 #include <vector>
 #include <tuple>
+#define MODEL_DIMENTIONS 30
+#define LEARNING_RATE 0.1
 
 using namespace std;
-#define KDIMENTIONS 30
-#define LEARNING_RATE 0.1 
 
 class Matrix{
     public:
@@ -29,7 +29,7 @@ class Matrix{
         }
     }
 
-    void fill_matrix(vector<tuple<int, int, int, int>> input_vector){
+    void fill_matrix(vector<array<int, 4>> input_vector){
         for(unsigned i = 0; i < input_vector.size(); i++){
             this->matrix[get<0>(input_vector[i])][get<1>(input_vector[i])] = get<2>(input_vector[i]);
         }
@@ -40,15 +40,17 @@ class Model{
     public:
         pair<int, int> p_dimentions;
         pair<int, int> q_dimentions;
+        int model_dimentions;
         float learning_rate;
         Matrix* p_matrix;
         Matrix* q_matrix;
     
-    Model(pair<int, int> dimentions, int knumber, int learning_rate){
+    Model(pair<int, int> dimentions, int model_dimentions, int learning_rate){
+        this->model_dimentions = model_dimentions;
         this->learning_rate = learning_rate;
         this->p_dimentions.first = dimentions.first;
-        this->p_dimentions.second = knumber;
-        this->q_dimentions.first = knumber;
+        this->p_dimentions.second = model_dimentions;
+        this->q_dimentions.first = model_dimentions;
         this->q_dimentions.second = dimentions.second;
         p_matrix = new Matrix(p_dimentions);
         q_matrix = new Matrix(q_dimentions);
@@ -62,6 +64,11 @@ class Model{
     Matrix getq_matrix(){
         return *q_matrix;
     }
+    
+    Matrix getp_matrix(){
+        return *p_matrix;
+    }
+    
     void stochastic_gradient_descent(){
         bool converged = false;
         while(1){    
@@ -71,34 +78,28 @@ class Model{
     }
 };
 
-pair<int,int> get_matrix_dimentions(vector<tuple<int, int, int, int>> vetor){
+int max_in_vector(vector<array<int, 4>> vetor,unsigned const int index){
+    int max_value = 0;
+    for(unsigned i = 0; i < vetor.size(); i++){
+        if(vetor[i][index] > max_value){
+            max_value = vetor[i][index];
+        }    
+    }
+    return max_value;
+}
+pair<int,int> get_matrix_dimentions(vector<array<int, 4>> vetor){
     pair<int,int> max_values;
-    int max_user = 0;
-    int max_item = 0;
-
-    for(unsigned i = 0; i < vetor.size(); i++){
-        if(get<0>(vetor[i]) > max_user){
-            max_user = get<0>(vetor[i]);
-        }    
-    }
-
-    for(unsigned i = 0; i < vetor.size(); i++){
-        if(get<1>(vetor[i]) > max_item){
-            max_item = get<1>(vetor[i]);
-        }    
-    }
-
-    max_values.first = max_user;
-    max_values.second = max_item;
+    max_values.first = max_in_vector(vetor, 0);
+    max_values.second = max_in_vector(vetor, 1);
     return max_values;
 }
 
-vector<tuple<int, int, int, int>> process_inputs(string filename){
+vector<array<int, 4>> process_inputs(string filename){
     ifstream file;
     file.open(filename);
     string line;
 
-    std::vector<tuple<int, int, int, int>> inputs;
+    std::vector<array<int, 4>> inputs;
     while(getline(file,line)){
         if (line.find(",") != std::string::npos){
             string work_line = line;
@@ -119,7 +120,7 @@ vector<tuple<int, int, int, int>> process_inputs(string filename){
             delimiter = ",";
             work_line = work_line.substr(work_line.find(delimiter)+1, -1);
             int timestamp = atoi(work_line.substr(work_line.find(delimiter)+1, -1).c_str());
-            inputs.push_back(make_tuple(user, item, rating, timestamp));
+            inputs.push_back({user, item, rating, timestamp});
         }
         else{
             string work_line = line;
@@ -133,7 +134,7 @@ vector<tuple<int, int, int, int>> process_inputs(string filename){
 
             int rating = 0;
             int timestamp = 0;
-            inputs.push_back(make_tuple(user, item, rating, timestamp));
+            inputs.push_back({user, item, rating, timestamp});
         }
     }
 
@@ -146,22 +147,15 @@ int main(int argc, char *argv[])
     string ratings_filename = argv[1];
     string targets_filename = argv[2];
 
-    vector<tuple<int, int, int, int>> ratings = process_inputs(ratings_filename);
-    vector<tuple<int, int, int, int>> targets = process_inputs(targets_filename);
+    vector<array<int, 4>> ratings = process_inputs(ratings_filename);
+    vector<array<int, 4>> targets = process_inputs(targets_filename);
 
     Matrix matrix(get_matrix_dimentions(ratings));
     matrix.create_matrix();
     matrix.fill_matrix(ratings);
 
-    Model model(matrix.dimentions, KDIMENTIONS, LEARNING_RATE);
+    Model model(matrix.dimentions, MODEL_DIMENTIONS, LEARNING_RATE);
     model.create_pq_matrix();
 
-    // iterate throug q matriz to check if it was created
-    for(int i =0; i < KDIMENTIONS; i++){
-        for(int j = 0; j < matrix.dimentions.second; j++)
-        {
-            int a = model.getq_matrix().matrix[i][j];
-        }
-    }
     return 0;
 }
