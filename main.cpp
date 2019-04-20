@@ -56,12 +56,15 @@ class Model{
         pair<int, int> q_dimentions;
         int model_dimentions;
         float learning_rate;
+        vector<array<int, 4>> train;
+
         Matrix* p_matrix;
         Matrix* q_matrix;
     
-    Model(pair<int, int> dimentions, int model_dimentions, float learning_rate){
+    Model(pair<int, int> dimentions, int model_dimentions, float learning_rate, vector<array<int, 4>> train){
         this->model_dimentions = model_dimentions;
         this->learning_rate = learning_rate;
+        this->train = train;
         this->p_dimentions.first = dimentions.first;
         this->p_dimentions.second = model_dimentions;
         this->q_dimentions.first = model_dimentions;
@@ -89,21 +92,21 @@ class Model{
         return *p_matrix;
     }
 
-    void stochastic_gradient_descent(Matrix main_matrix){
-        int** matrix = main_matrix.matrix;
+    void stochastic_gradient_descent(){
+        int user;
+        int item;
+        int rate;
         bool converged = false;
         float error = 1.0;
+
         while(1){
             error = error * this->learning_rate;
 
-            for(int i = 0; i < main_matrix.x_dimention; i++)
-            {
-                for(int j = 0; j < main_matrix.y_dimention; j++)
-                {
-                    
-                }
+            for(unsigned i = 0; i < this->train.size(); i++){
+                user = this->train[i][0];
+                item = this->train[i][0];
+                rate = this->train[i][0];
             }
-            
             converged = true;
             if(error < MIN_ERROR){
                 converged = true;
@@ -190,10 +193,10 @@ int main(int argc, char *argv[])
     matrix.create_matrix();
     matrix.fill_matrix(ratings);
 
-    Model model(matrix.dimentions, MODEL_DIMENTIONS, LEARNING_RATE);
+    Model model(matrix.dimentions, MODEL_DIMENTIONS, LEARNING_RATE, ratings);
     model.create_pq_matrix();
     model.fill_pq_matrix();
-    model.stochastic_gradient_descent(matrix);
+    model.stochastic_gradient_descent();
 
     return 0;
 }
