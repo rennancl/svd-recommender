@@ -57,11 +57,13 @@ class Model{
         int model_dimentions;
         float learning_rate;
         vector<array<int, 4>> train;
+        vector<array<int, 4>> test;
+        vector<array<int, 4>> target;
 
         Matrix* p_matrix;
         Matrix* q_matrix;
     
-    Model(pair<int, int> dimentions, int model_dimentions, float learning_rate, vector<array<int, 4>> train){
+    Model(pair<int, int> dimentions, int model_dimentions, float learning_rate, vector<array<int, 4>> train, vector<array<int, 4>>  target){
         this->model_dimentions = model_dimentions;
         this->learning_rate = learning_rate;
         this->train = train;
@@ -91,8 +93,19 @@ class Model{
     Matrix getp_matrix(){
         return *p_matrix;
     }
-    float get_prediction(){
-        return 0;
+
+    void print_csv_line(int user, int item, int prediction){
+        cout << "u" << user << ":" << item << "," << prediction << endl;
+    }
+    void get_prediction(){
+        int user, item, prediction;
+        for(unsigned i = 0; i < this->train.size(); i++){
+            user = this->train[i][0];
+            item = this->train[i][1];
+            prediction =  get_value_product(user,item);
+            print_csv_line(user, item, prediction);
+        }
+        return;
     }
 
     int get_value_product(int user, int item){
@@ -125,7 +138,8 @@ class Model{
                 error = rate - get_value_product(user,item);
                 update_matrix(user, item, error);
             }
-            if(error < 5){
+            converged = true;
+            if(error < 6){
                 converged = true;
             }
             if(converged) break;
@@ -210,10 +224,11 @@ int main(int argc, char *argv[])
     matrix.create_matrix();
     matrix.fill_matrix(ratings);
 
-    Model model(matrix.dimentions, MODEL_DIMENTIONS, LEARNING_RATE, ratings);
+    Model model(matrix.dimentions, MODEL_DIMENTIONS, LEARNING_RATE, ratings, targets);
     model.create_pq_matrix();
     model.fill_pq_matrix();
     model.stochastic_gradient_descent();
+    model.get_prediction();
 
     return 0;
 }
