@@ -4,9 +4,11 @@
 #include <string>
 #include <vector>
 #include <tuple>
+#include <cmath> 
 #define MODEL_DIMENTIONS 30
-#define LEARNING_RATE .9
-#define MIN_ERROR 0.00001
+#define LEARNING_RATE .01
+#define MIN_ERROR 0.5
+
 
 using namespace std;
 
@@ -15,7 +17,7 @@ class Matrix{
         int x_dimention;
         int y_dimention;
         pair<int, int> dimentions;
-        int** matrix;
+        float** matrix;
 
     Matrix(pair<int, int> dimentions){
         this->dimentions = dimentions;
@@ -24,20 +26,19 @@ class Matrix{
     }
 
     void create_matrix(){
-    this->matrix = new int*[x_dimention + 1];
+    this->matrix = new float*[x_dimention + 1];
     for (int i = 0; i < x_dimention + 1; i++)
         {
-            this->matrix[i] = new int[y_dimention + 1];
+            this->matrix[i] = new float[y_dimention + 1];
         }
     }
 
     void fill_ones(){
-        cout << x_dimention << "-" << y_dimention << endl;
-        for(int i = 0; i < x_dimention; i++)
+        for(int i = 0; i < x_dimention + 1; i++)
         {
-            for(int j = 0; j < y_dimention; j++)
+            for(int j = 0; j < y_dimention + 1; j++)
             {
-                matrix[i][j] = 1;
+                matrix[i][j] = 1.0;
             }
             
         }
@@ -45,9 +46,10 @@ class Matrix{
 
     void fill_matrix(vector<array<int, 4>> input_vector){
         for(unsigned i = 0; i < input_vector.size(); i++){
-            this->matrix[get<0>(input_vector[i])][get<1>(input_vector[i])] = get<2>(input_vector[i]);
+            this->matrix[get<0>(input_vector[i])][get<1>(input_vector[i])] = (float)get<2>(input_vector[i]);
         }
     }
+
 };
 
 class Model{
@@ -98,7 +100,7 @@ class Model{
         cout << "u" << user << ":" << item << "," << prediction << endl;
     }
     void get_prediction(){
-        int user, item, prediction;
+        float user, item, prediction;
         for(unsigned i = 0; i < this->train.size(); i++){
             user = this->train[i][0];
             item = this->train[i][1];
@@ -108,41 +110,35 @@ class Model{
         return;
     }
 
-    int get_value_product(int user, int item){
-        int value = 0;
+    float get_value_product(int user, int item){
+        float value = 0;
         for(int j = 0; j < this->model_dimentions; j++){
             value += p_matrix->matrix[user][j] * q_matrix->matrix[j][item];
         }
         return value;
     }
 
-    void update_matrix(int user, int item, int error){
+    void update_matrix(int user, int item, float error){
         for(int j = 0; j < this->model_dimentions; j++){
-            p_matrix->matrix[user][j] = q_matrix->matrix[j][item] * 2 * learning_rate * error ;
-            q_matrix->matrix[j][item] = p_matrix->matrix[user][j] * 2 * learning_rate * error;
+            this->p_matrix->matrix[user][j] = this->p_matrix->matrix[user][j]+ (this->q_matrix->matrix[j][item] * 2 * learning_rate * error);
+            this->q_matrix->matrix[j][item] = this->q_matrix->matrix[j][item]+ (this->p_matrix->matrix[user][j] * 2 * learning_rate * error);
         }
     }
 
     void stochastic_gradient_descent(){
         int user;
         int item;
-        int rate;
-        bool converged = false;
-        int error;
-
+        float rate;
+        float error;
         while(1){
             for(unsigned i = 0; i < this->train.size(); i++){
                 user = this->train[i][0];
                 item = this->train[i][1];
                 rate = this->train[i][2];
-                error = rate - get_value_product(user,item);
+                error = (float)rate - get_value_product(user,item);
                 update_matrix(user, item, error);
             }
-            converged = true;
-            if(error < 6){
-                converged = true;
-            }
-            if(converged) break;
+            if(abs(error) < MIN_ERROR) break;
         }
     }
 };
@@ -190,6 +186,7 @@ vector<array<int, 4>> process_inputs(string filename){
             delimiter = ",";
             work_line = work_line.substr(work_line.find(delimiter)+1, -1);
             int timestamp = atoi(work_line.substr(work_line.find(delimiter)+1, -1).c_str());
+            if(user == 0 and item == 0) continue;
             inputs.push_back({user, item, rating, timestamp});
         }
         else{
@@ -204,6 +201,7 @@ vector<array<int, 4>> process_inputs(string filename){
 
             int rating = 0;
             int timestamp = 0;
+            if(user == 0 and item == 0) continue;
             inputs.push_back({user, item, rating, timestamp});
         }
     }
@@ -226,9 +224,10 @@ int main(int argc, char *argv[])
 
     Model model(matrix.dimentions, MODEL_DIMENTIONS, LEARNING_RATE, ratings, targets);
     model.create_pq_matrix();
-    model.fill_pq_matrix();
+    model.fill_pq_matrix(); 
     model.stochastic_gradient_descent();
     model.get_prediction();
 
     return 0;
 }
+
