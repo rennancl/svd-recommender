@@ -7,7 +7,7 @@
 #include <cmath> 
 #define MODEL_DIMENTIONS 30
 #define LEARNING_RATE .01
-#define MIN_ERROR 0.5
+#define MIN_ERROR 0.3
 
 
 using namespace std;
@@ -96,7 +96,7 @@ class Model{
         return *p_matrix;
     }
 
-    void print_csv_line(int user, int item, int prediction){
+    void print_csv_line(int user, int item, float prediction){
         cout << "u" << user << ":" << item << "," << prediction << endl;
     }
     void get_prediction(){
