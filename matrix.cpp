@@ -31,3 +31,71 @@ void Matrix::fill_matrix(std::vector<array<int, 4>> input_vector){
         this->matrix[get<0>(input_vector[i])][get<1>(input_vector[i])] = (float)get<2>(input_vector[i]);
     }
 }
+
+
+int max_in_vector(vector<array<int, 4>> vetor,unsigned const int index){
+    int max_value = 0;
+    for(unsigned i = 0; i < vetor.size(); i++){
+        if(vetor[i][index] > max_value){
+            max_value = vetor[i][index];
+        }    
+    }
+    return max_value;
+}
+
+pair<int,int> get_matrix_dimentions(vector<array<int, 4>> vetor){
+    pair<int,int> max_values;
+    max_values.first = max_in_vector(vetor, 0);
+    max_values.second = max_in_vector(vetor, 1);
+    return max_values;
+}
+
+vector<array<int, 4>> process_inputs(string filename){
+    ifstream file;
+    file.open(filename);
+    string line;
+
+    std::vector<array<int, 4>> inputs;
+    while(getline(file,line)){
+        if (line.find(",") != std::string::npos){
+            string work_line = line;
+            string delimiter = ":";
+            int user = atoi(work_line.substr(1, work_line.find(delimiter)-1).c_str());
+
+            work_line = line;
+            delimiter = ":";
+            string delimiter2 = ",";
+            int item = atoi(work_line.substr( work_line.find(delimiter)+2, work_line.find(delimiter2)).c_str());
+
+            work_line = line;
+            delimiter = ",";
+            work_line = work_line.substr(work_line.find(delimiter)+1, -1);
+            int rating = atoi(work_line.substr(0, work_line.find(delimiter)).c_str());
+
+            work_line = line;
+            delimiter = ",";
+            work_line = work_line.substr(work_line.find(delimiter)+1, -1);
+            int timestamp = atoi(work_line.substr(work_line.find(delimiter)+1, -1).c_str());
+            if(user == 0 and item == 0) continue;
+            inputs.push_back({user, item, rating, timestamp});
+        }
+        else{
+            string work_line = line;
+            string delimiter = ":";
+            int user = atoi(work_line.substr(1, work_line.find(delimiter)-1).c_str());
+
+            work_line = line;
+            delimiter = ":";
+            string delimiter2 = ",";
+            int item = atoi(work_line.substr( work_line.find(delimiter)+2, work_line.find(delimiter2)).c_str());
+
+            int rating = 0;
+            int timestamp = 0;
+            if(user == 0 and item == 0) continue;
+            inputs.push_back({user, item, rating, timestamp});
+        }
+    }
+
+    file.close();
+    return inputs;
+}

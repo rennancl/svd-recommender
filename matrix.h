@@ -23,3 +23,10 @@ class Matrix{
     void fill_ones();
     void fill_matrix(std::vector<array<int, 4>> input_vector);
 };
+
+
+int max_in_vector(vector<array<int, 4>> vetor,unsigned const int index);
+
+pair<int,int> get_matrix_dimentions(vector<array<int, 4>> vetor);
+
+vector<array<int, 4>> process_inputs(string filename);
