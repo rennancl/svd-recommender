@@ -1,4 +1,8 @@
 #include "model.h"
+#define MODEL_DIMENTIONS 30
+#define LEARNING_RATE .0001
+#define MIN_ERROR 0.1
+#define EPOCHS 100
 using namespace std;
 
 Model::Model(std::pair<int, int> dimentions, int model_dimentions, float learning_rate, std::vector<array<int, 4>> train){
@@ -40,7 +44,7 @@ void Model::get_prediction(string filename){
     file.open(filename);
     string line;
     float prediction;
-    cout << "User:Item" << "," << "Prediction" << endl;
+    cout << "UserId:ItemId" << "," << "Prediction" << endl;
     while(getline(file,line)){
             string work_line = line;
             string delimiter = ":";
@@ -53,6 +57,9 @@ void Model::get_prediction(string filename){
 
             if(user == 0 and item == 0) continue;
             prediction =  get_value_product(user,item);
+            if(prediction > 10){
+                prediction = 10;
+            }
             cout << line << "," << prediction<< endl;
         }   
 

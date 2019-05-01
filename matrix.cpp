@@ -20,7 +20,7 @@ void Matrix::fill_ones(){
     {
         for(int j = 0; j < y_dimention + 1; j++)
         {
-            matrix[i][j] = 1.0;
+            matrix[i][j] = 0.4;
         }
         
     }

@@ -5,10 +5,6 @@
 #include <vector>
 #include <tuple>
 #include <cmath>
-#define MODEL_DIMENTIONS 30
-#define LEARNING_RATE .002
-#define MIN_ERROR 0.1
-#define EPOCHS 50
 using namespace std;
 
 class Matrix{
