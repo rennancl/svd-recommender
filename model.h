@@ -1,0 +1,43 @@
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <tuple>
+#include <cmath>
+#include "matrix.h"
+using namespace std;
+
+class Model{
+    public:
+        std::pair<int, int> p_dimentions;
+        std::pair<int, int> q_dimentions;
+        int model_dimentions;
+        float learning_rate;
+        std::vector<array<int, 4>> train;
+        std::vector<array<int, 4>> test;
+        std::vector<array<int, 4>> target;
+
+        Matrix* p_matrix;
+        Matrix* q_matrix;
+    
+    Model(std::pair<int, int> dimentions, int model_dimentions, float learning_rate, std::vector<array<int, 4>> train);
+
+    void create_pq_matrix();
+
+    void fill_pq_matrix();
+
+    Matrix getq_matrix();
+    
+    Matrix getp_matrix();
+
+    void print_csv_line(int user, int item, float prediction);
+
+    void get_prediction(string filename);
+
+    float get_value_product(int user, int item);
+
+    void update_matrix(int user, int item, float error);
+
+    void stochastic_gradient_descent();
+};
