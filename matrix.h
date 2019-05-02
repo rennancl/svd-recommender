@@ -17,12 +17,12 @@ class Matrix{
     Matrix(std::pair<int, int> dimentions);
     void create_matrix();
     void fill_ones();
-    void fill_matrix(std::vector<array<int, 4>> input_vector);
+    void fill_matrix(std::vector<array<int, 5>> input_vector);
 };
 
 
-int max_in_vector(vector<array<int, 4>> vetor,unsigned const int index);
+int max_in_vector(vector<array<int, 5>> vetor,unsigned const int index);
 
-pair<int,int> get_matrix_dimentions(vector<array<int, 4>> vetor);
+pair<int,int> get_matrix_dimentions(vector<array<int, 5>> vetor);
 
-vector<array<int, 4>> process_inputs(string filename);
+vector<array<int, 5>> process_inputs(string filename);

@@ -14,14 +14,15 @@ class Model{
         std::pair<int, int> q_dimentions;
         int model_dimentions;
         float learning_rate;
-        std::vector<array<int, 4>> train;
-        std::vector<array<int, 4>> test;
-        std::vector<array<int, 4>> target;
+        float mean;
+        std::vector<array<int, 5>> train;
+        std::vector<array<int, 5>> test;
+        std::vector<array<int, 5>> target;
 
         Matrix* p_matrix;
         Matrix* q_matrix;
     
-    Model(std::pair<int, int> dimentions, int model_dimentions, float learning_rate, std::vector<array<int, 4>> train);
+    Model(std::pair<int, int> dimentions, int model_dimentions, float learning_rate, std::vector<array<int, 5>> train);
 
     void create_pq_matrix();
 
@@ -30,6 +31,8 @@ class Model{
     Matrix getq_matrix();
     
     Matrix getp_matrix();
+
+    void get_mean();
 
     void print_csv_line(int user, int item, float prediction);
 

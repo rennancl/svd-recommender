@@ -1,11 +1,11 @@
 #include "model.h"
+using namespace std;
 #define MODEL_DIMENTIONS 30
 #define LEARNING_RATE .0001
 #define MIN_ERROR 0.1
 #define EPOCHS 100
-using namespace std;
 
-Model::Model(std::pair<int, int> dimentions, int model_dimentions, float learning_rate, std::vector<array<int, 4>> train){
+Model::Model(std::pair<int, int> dimentions, int model_dimentions, float learning_rate, std::vector<array<int, 5>> train){
     this->model_dimentions = model_dimentions;
     this->learning_rate = learning_rate;
     this->train = train;
@@ -60,6 +60,9 @@ void Model::get_prediction(string filename){
             if(prediction > 10){
                 prediction = 10;
             }
+            
+            //GAMBIARRA GAMBIARRA
+            if(prediction < 4.9) prediction = this->mean;
             cout << line << "," << prediction<< endl;
         }   
 
@@ -80,6 +83,14 @@ void Model::update_matrix(int user, int item, float error){
         this->p_matrix->matrix[user][j] = this->p_matrix->matrix[user][j]+ (this->q_matrix->matrix[j][item] * 2 * learning_rate * error);
         this->q_matrix->matrix[j][item] = this->q_matrix->matrix[j][item]+ (this->p_matrix->matrix[user][j] * 2 * learning_rate * error);
     }
+}
+
+void Model::get_mean(){
+    int sum = 0;
+    for(unsigned i = 0; i < this->train.size(); i++){
+        sum += this->train[i][2];
+    }
+    this->mean = (float)sum/(float)this->train.size();
 }
 
 void Model::stochastic_gradient_descent(){
