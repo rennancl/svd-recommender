@@ -6,6 +6,9 @@
 #include <tuple>
 #include <cmath>
 #include "matrix.h"
+#define MODEL_DIMENTIONS 50
+#define LEARNING_RATE .002
+#define EPOCHS 100
 using namespace std;
 
 class Model{
@@ -22,7 +25,7 @@ class Model{
         Matrix* p_matrix;
         Matrix* q_matrix;
     
-    Model(std::pair<int, int> dimentions, int model_dimentions, float learning_rate, std::vector<array<int, 5>> train);
+    Model(std::pair<int, int> dimentions, std::vector<array<int, 5>> train);
 
     void create_pq_matrix();
 

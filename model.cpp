@@ -1,13 +1,9 @@
 #include "model.h"
 using namespace std;
-#define MODEL_DIMENTIONS 30
-#define LEARNING_RATE .0001
-#define MIN_ERROR 0.1
-#define EPOCHS 100
 
-Model::Model(std::pair<int, int> dimentions, int model_dimentions, float learning_rate, std::vector<array<int, 5>> train){
-    this->model_dimentions = model_dimentions;
-    this->learning_rate = learning_rate;
+Model::Model(std::pair<int, int> dimentions, std::vector<array<int, 5>> train){
+    this->model_dimentions = MODEL_DIMENTIONS;
+    this->learning_rate = LEARNING_RATE;
     this->train = train;
     this->p_dimentions.first = dimentions.first;
     this->p_dimentions.second = model_dimentions;
