@@ -21,11 +21,11 @@ int main(int argc, char *argv[])
     vector<array<int, 4>> ratings = process_inputs(ratings_filename);
     vector<array<int, 4>> targets = process_inputs(targets_filename);
 
-    Matrix matrix(get_matrix_dimentions(ratings));
-    matrix.create_matrix();
-    matrix.fill_matrix(ratings);
+    //Matrix matrix(get_matrix_dimentions(ratings));
+    // matrix.create_matrix(); //seriously questioning if this function is necessary
+    // matrix.fill_matrix(ratings); //seriously questioning if this function is necessary
 
-    Model model(matrix.dimentions, MODEL_DIMENTIONS, LEARNING_RATE, ratings);
+    Model model(get_matrix_dimentions(ratings)/*matrix.dimentions*/, MODEL_DIMENTIONS, LEARNING_RATE, ratings);
     model.create_pq_matrix();
     model.fill_pq_matrix(); 
     model.stochastic_gradient_descent();
