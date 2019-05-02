@@ -25,6 +25,8 @@ int main(int argc, char *argv[])
     // matrix.create_matrix(); //seriously questioning if this function is necessary
     // matrix.fill_matrix(ratings); //seriously questioning if this function is necessary
 
+    //1.0 need to include here a function which calculate the global rating so this gonna be the cold start recomendation
+    //2.0 need to treat the cases which the iten or user was not seen
     Model model(get_matrix_dimentions(ratings)/*matrix.dimentions*/, MODEL_DIMENTIONS, LEARNING_RATE, ratings);
     model.create_pq_matrix();
     model.fill_pq_matrix(); 
