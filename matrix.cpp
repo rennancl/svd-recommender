@@ -1,6 +1,6 @@
 #include "matrix.h"
 using namespace std;
-#define INITAL_VALUE 0.4
+#define INITAL_VALUE 0.2
 
 Matrix::Matrix(std::pair<int, int> dimentions){
     this->dimentions = dimentions;
