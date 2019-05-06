@@ -1,5 +1,6 @@
 #include "matrix.h"
 using namespace std;
+#define INITAL_VALUE 0.4
 
 Matrix::Matrix(std::pair<int, int> dimentions){
     this->dimentions = dimentions;
@@ -20,7 +21,7 @@ void Matrix::fill_ones(){
     {
         for(int j = 0; j < y_dimention + 1; j++)
         {
-            matrix[i][j] = 0.4;
+            matrix[i][j] = INITAL_VALUE;
         }
         
     }

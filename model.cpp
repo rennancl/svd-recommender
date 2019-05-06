@@ -13,6 +13,8 @@ Model::Model(std::pair<int, int> dimentions, std::vector<array<int, 5>> train){
     this->mean_items = new int[dimentions.second +1 ];
     this->users_num_edges = new int[dimentions.first + 1];
     this->items_num_edges = new int[dimentions.second + 1];
+    this->user_bias = new float[dimentions.first + 1];
+    this->item_bias = new float[dimentions.second + 1];
     p_matrix = new Matrix(p_dimentions);
     q_matrix = new Matrix(q_dimentions);
 }
@@ -70,7 +72,18 @@ void Model::get_prediction(string filename){
             if(items_num_edges[item] == 0 && users_num_edges[user] != 0){
                 prediction = (float)mean_users[user]/(float)users_num_edges[user];
             }
-            cout << line << "," << prediction<< endl;
+            float u_bias = 0.0;
+            if(items_num_edges[item] != 0 && users_num_edges[user] != 0){
+                u_bias = user_bias[user]/(float)users_num_edges[user];
+                u_bias = u_bias/BIAS_DIVISOR;
+            }
+            float i_bias = 0.0;
+            if(items_num_edges[item] != 0 && users_num_edges[user] != 0){
+                i_bias = item_bias[item]/(float)items_num_edges[item];
+                i_bias = i_bias/BIAS_DIVISOR;
+            }
+            cout << line << "," << prediction + u_bias + i_bias<<endl;
+            
         }   
 
     file.close();
@@ -98,14 +111,21 @@ void Model::get_mean(){
     {
         mean_users[i] = 0;
         users_num_edges[i] = 0;
+        user_bias[i] = 0.0; 
     }
 
     for(int i = 0; i <  this->q_dimentions.second + 1; i++)
     {
         mean_items[i] = 0;
         items_num_edges[i] = 0;
+        item_bias[i] = 0.0; 
     }
 
+    for(unsigned i = 0; i < this->train.size(); i++){
+        sum += this->train[i][2];
+    }
+    this->mean = (float)sum/(float)this->train.size();
+        
     for(unsigned i = 0; i < this->train.size(); i++){
         int user = this->train[i][0];
         int item = this->train[i][1];
@@ -114,12 +134,9 @@ void Model::get_mean(){
         items_num_edges[item]++;
         mean_users[user] += rate;
         users_num_edges[user]++;
+        user_bias[user] += this->mean - rate;
+        item_bias[item] += this->mean - rate;
     }
-
-    for(unsigned i = 0; i < this->train.size(); i++){
-        sum += this->train[i][2];
-    }
-    this->mean = (float)sum/(float)this->train.size();
 }
 
 void Model::stochastic_gradient_descent(){
