@@ -24,6 +24,10 @@ class Model{
 
         Matrix* p_matrix;
         Matrix* q_matrix;
+        int* mean_users;
+        int* mean_items;
+        int* users_num_edges;
+        int* items_num_edges;
     
     Model(std::pair<int, int> dimentions, std::vector<array<int, 5>> train);
 
