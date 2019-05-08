@@ -42,15 +42,20 @@ class Model{
     
     Matrix getp_matrix();
 
+    //this function get the global item rating mean
     void get_mean();
 
     void print_csv_line(int user, int item, float prediction);
 
+    //this function gets the file output and process all pairs to predict genarating the submission file
     void get_prediction(string filename);
 
+    //used to generate the prediction, computing the dot product os two vectors
     float get_value_product(int user, int item);
 
+    //function used to update both user and item matrixes
     void update_matrix(int user, int item, float error);
 
+    //this is the fuction to train the model
     void stochastic_gradient_descent();
 };

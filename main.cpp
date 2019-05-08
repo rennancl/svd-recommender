@@ -16,9 +16,6 @@ int main(int argc, char *argv[])
 
     vector<array<int, 5>> ratings = process_inputs(ratings_filename);
 
-    //2.0 need to treat the cases which the iten or user was not seen
-    //3.0 calculates de user and item bias
-
     Model model(get_matrix_dimentions(ratings), ratings);
     model.get_mean();
     model.create_pq_matrix();

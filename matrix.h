@@ -20,9 +20,11 @@ class Matrix{
     void fill_matrix(std::vector<array<int, 5>> input_vector);
 };
 
-
+//find the biggest id for both itens and users
 int max_in_vector(vector<array<int, 5>> vetor,unsigned const int index);
 
+//this is used to alocate both matrix based 
 pair<int,int> get_matrix_dimentions(vector<array<int, 5>> vetor);
 
+//this function uses a filename to generate the vector representing the file 
 vector<array<int, 5>> process_inputs(string filename);

@@ -48,6 +48,7 @@ void Model::get_prediction(string filename){
     float prediction;
     cout << "UserId:ItemId" << "," << "Prediction" << endl;
     while(getline(file,line)){
+            //this part process each file to extract the user,the item, the rating;
             string work_line = line;
             string delimiter = ":";
             int user = atoi(work_line.substr(1, work_line.find(delimiter)-1).c_str());
@@ -107,6 +108,7 @@ void Model::update_matrix(int user, int item, float error){
 
 void Model::get_mean(){
     int sum = 0;
+    //calculate user bias
     for(int i = 0; i < this->p_dimentions.first + 1; i++)
     {
         mean_users[i] = 0;
@@ -114,6 +116,7 @@ void Model::get_mean(){
         user_bias[i] = 0.0; 
     }
 
+    //calculate item bias
     for(int i = 0; i <  this->q_dimentions.second + 1; i++)
     {
         mean_items[i] = 0;
@@ -121,6 +124,7 @@ void Model::get_mean(){
         item_bias[i] = 0.0; 
     }
 
+    //calculate global mean
     for(unsigned i = 0; i < this->train.size(); i++){
         sum += this->train[i][2];
     }
@@ -144,12 +148,15 @@ void Model::stochastic_gradient_descent(){
     int item;
     float rate;
     float error;
+    //each iteration is a epoch
     for(unsigned j = 0; j < EPOCHS; j++){
         for(unsigned i = 0; i < this->train.size(); i++){
             user = this->train[i][0];
             item = this->train[i][1];
             rate = this->train[i][2];
+            //gets error
             error = (float)rate - get_value_product(user,item);
+            //updates both matrix using the error above
             update_matrix(user, item, error);
         }
     }
